@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Polyatomic Ion Flashcards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=STIX+Two+Text:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E8EDF1; --grid:#D9E0E6; --ink:#16212C; --muted:#56636F; --card:#FBFCFD; --line:#C6D0D9;
+  --c1:#1F7A8C; --c2:#5B4B8A; --c3:#A86A12; --good:#2E7D4F; --again:#9A4A2E;
+  --ui:"Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --chem:"STIX Two Text", "Times New Roman", Georgia, serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#111920; --grid:#1A242D; --ink:#E5EBF0; --muted:#94A2AF; --card:#19232C; --line:#2C3A46;
+    --c1:#52B6C9; --c2:#A193D6; --c3:#E2A64C; --good:#5BC489; --again:#E48A68;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111920; --grid:#1A242D; --ink:#E5EBF0; --muted:#94A2AF; --card:#19232C; --line:#2C3A46;
+  --c1:#52B6C9; --c2:#A193D6; --c3:#E2A64C; --good:#5BC489; --again:#E48A68;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; min-height:100%; font-family:var(--ui); color:var(--ink); background-color:var(--bg);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:24px 24px;
+}
+.wrap{max-width:640px; margin:0 auto; padding:28px 20px 40px}
+header{display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap}
+h1{font-size:clamp(1.6rem,5vw,2.2rem); font-weight:800; letter-spacing:-.02em; margin:0}
+.count{color:var(--muted); font-size:.95rem}
+.controls{display:flex; flex-wrap:wrap; gap:10px; margin:20px 0 22px; align-items:center}
+.seg{display:inline-flex; border:1px solid var(--line); border-radius:999px; background:var(--card); padding:3px}
+.seg button{font:inherit; font-size:.9rem; border:0; background:none; color:var(--muted); padding:6px 12px; border-radius:999px; cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink); color:var(--bg)}
+.plain{font:inherit; font-size:.9rem; border:1px solid var(--line); background:var(--card); color:var(--ink); padding:7px 14px; border-radius:999px; cursor:pointer}
+button:focus-visible{outline:3px solid var(--c1); outline-offset:2px}
+
+.stage{perspective:1400px}
+.card{position:relative; width:100%; aspect-ratio:3/2; cursor:pointer; transform-style:preserve-3d; transition:transform .45s cubic-bezier(.2,.7,.2,1); border:0; background:none; padding:0; font:inherit; color:inherit; display:block}
+.card.flipped{transform:rotateY(180deg)}
+.face{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; background:var(--card); border:1px solid var(--line); border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; overflow:hidden; box-shadow:0 1px 0 var(--line), 0 14px 30px -18px rgba(20,35,50,.35)}
+.face::before{content:""; position:absolute; left:0; top:0; bottom:0; width:10px; background:var(--accent)}
+.back{transform:rotateY(180deg)}
+.charge-tag{position:absolute; top:14px; right:18px; font-family:var(--chem); font-size:1.15rem; color:var(--accent); font-weight:600}
+.prompt-name{font-size:clamp(1.8rem,7vw,3rem); font-weight:600; letter-spacing:-.015em; text-align:center; line-height:1.15}
+.prompt-formula{font-family:var(--chem); font-size:clamp(2.6rem,11vw,4.6rem); font-weight:500; line-height:1}
+.alt{font-family:var(--chem); color:var(--muted); font-size:clamp(1.1rem,4vw,1.5rem); margin-top:14px}
+.hint{position:absolute; bottom:14px; font-size:.82rem; color:var(--muted)}
+sub,sup{font-size:.55em; line-height:0}
+sub{vertical-align:-.35em} sup{vertical-align:.85em}
+
+.actions{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:22px}
+.actions button{font:inherit; font-weight:600; font-size:1rem; padding:14px; border-radius:6px; cursor:pointer; border:1.5px solid currentColor; background:var(--card)}
+#again{color:var(--again)} #got{color:var(--good)}
+.actions kbd{font-family:var(--ui); font-weight:400; font-size:.78rem; opacity:.75; margin-left:6px}
+.bar{height:6px; background:var(--line); border-radius:3px; margin-top:22px; overflow:hidden}
+.bar span{display:block; height:100%; width:0; background:var(--good); transition:width .3s}
+.keys{color:var(--muted); font-size:.85rem; margin-top:14px; text-align:center}
+.done{text-align:center; padding:40px 20px; background:var(--card); border:1px solid var(--line); border-radius:6px}
+.done h2{margin:0 0 6px; font-size:1.6rem}
+.done p{color:var(--muted); margin:0 0 18px}
+.ref{margin-top:36px}
+.ref summary{cursor:pointer; font-weight:600}
+.table-scroll{overflow-x:auto; margin-top:12px}
+table{border-collapse:collapse; width:100%; background:var(--card); border:1px solid var(--line)}
+td{padding:7px 12px; border-top:1px solid var(--line)}
+td:last-child{font-family:var(--chem); font-size:1.1rem}
+td.grp{font-weight:700; color:var(--accent); padding-top:14px}
+@media (prefers-reduced-motion:reduce){.card{transition:none}}
+@media (max-width:420px){.card{aspect-ratio:4/3}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Polyatomic ions</h1>
+    <div class="count" id="count"></div>
+  </header>
+
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Charge">
+      <button data-charge="0" aria-pressed="true">All</button>
+      <button data-charge="1" aria-pressed="false">1−</button>
+      <button data-charge="2" aria-pressed="false">2−</button>
+      <button data-charge="3" aria-pressed="false">3−</button>
+    </div>
+    <div class="seg" role="group" aria-label="Card front">
+      <button data-mode="name" aria-pressed="true">Name first</button>
+      <button data-mode="formula" aria-pressed="false">Formula first</button>
+    </div>
+    <button class="plain" id="shuffle">Shuffle</button>
+  </div>
+
+  <div id="study">
+    <div class="stage">
+      <button class="card" id="card" aria-label="Flip card">
+        <div class="face front" id="front"></div>
+        <div class="face back" id="back"></div>
+      </button>
+    </div>
+    <div class="actions">
+      <button id="again">Study again<kbd>1</kbd></button>
+      <button id="got">Got it<kbd>2</kbd></button>
+    </div>
+  </div>
+  <div class="done" id="done" hidden><h2 id="doneTitle"></h2><p>Every card in this set is marked as known.</p><button class="plain" id="restart">Start over</button></div>
+  <div class="bar" aria-hidden="true"><span id="bar"></span></div>
+  <p class="keys">Click the card or press Space to flip.</p>
+
+  <details class="ref">
+    <summary>Full list</summary>
+    <div class="table-scroll"><table id="table"></table></div>
+  </details>
+</div>
+
+<script>
+const IONS = [
+  {n:"acetate", f:"C<sub>2</sub>H<sub>3</sub>O<sub>2</sub>", alt:"CH<sub>3</sub>COO", c:1},
+  {n:"bicarbonate (hydrogen carbonate)", f:"HCO<sub>3</sub>", c:1},
+  {n:"chlorate", f:"ClO<sub>3</sub>", c:1},
+  {n:"chlorite", f:"ClO<sub>2</sub>", c:1},
+  {n:"cyanide", f:"CN", c:1},
+  {n:"hydrogen sulfate", f:"HSO<sub>4</sub>", c:1},
+  {n:"hydroxide", f:"OH", c:1},
+  {n:"hypochlorite", f:"ClO", c:1},
+  {n:"nitrate", f:"NO<sub>3</sub>", c:1},
+  {n:"nitrite", f:"NO<sub>2</sub>", c:1},
+  {n:"permanganate", f:"MnO<sub>4</sub>", c:1},
+  {n:"perchlorate", f:"ClO<sub>4</sub>", c:1},
+  {n:"carbonate", f:"CO<sub>3</sub>", c:2},
+  {n:"chromate", f:"CrO<sub>4</sub>", c:2},
+  {n:"dichromate", f:"Cr<sub>2</sub>O<sub>7</sub>", c:2},
+  {n:"peroxide", f:"O<sub>2</sub>", c:2},
+  {n:"sulfate", f:"SO<sub>4</sub>", c:2},
+  {n:"sulfite", f:"SO<sub>3</sub>", c:2},
+  {n:"phosphate", f:"PO<sub>4</sub>", c:3},
+  {n:"phosphite", f:"PO<sub>3</sub>", c:3},
+];
+const ACCENT = {1:"var(--c1)",2:"var(--c2)",3:"var(--c3)"};
+const chg = c => c===1 ? "−" : c+"−";
+const formula = (f,c) => f + "<sup>" + chg(c) + "</sup>";
+
+let charge = 0, mode = "name", queue = [], known = new Set(), flipped = false;
+const $ = id => document.getElementById(id);
+
+function pool(){ return IONS.map((_,i)=>i).filter(i => !charge || IONS[i].c===charge); }
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function reset(doShuffle){ known.clear(); queue = pool(); if(doShuffle) shuffle(queue); flipped=false; render(); }
+
+function faceHTML(ion, side){
+  const showName = (mode==="name") === (side==="front");
+  const tag = (side==="back" || mode==="formula") ? `<span class="charge-tag">${chg(ion.c)}</span>` : "";
+  if(showName) return `${tag}<div class="prompt-name">${ion.n}</div>${side==="front"?'<div class="hint">What is the formula?</div>':''}`;
+  return `${tag}<div class="prompt-formula">${formula(ion.f,ion.c)}</div>${ion.alt?`<div class="alt">or ${formula(ion.alt,ion.c)}</div>`:''}${side==="front"?'<div class="hint">What is the name?</div>':''}`;
+}
+
+function render(){
+  const total = pool().length;
+  $("count").textContent = `${queue.length} left, ${known.size} known`;
+  $("bar").style.width = (total ? known.size/total*100 : 0) + "%";
+  const empty = !queue.length;
+  $("study").hidden = empty; $("done").hidden = !empty;
+  if(empty){ $("doneTitle").textContent = `You know all ${total}.`; return; }
+  const ion = IONS[queue[0]], card = $("card");
+  card.style.setProperty("--accent", ACCENT[ion.c]);
+  card.classList.toggle("flipped", flipped);
+  $("front").innerHTML = faceHTML(ion,"front");
+  $("back").innerHTML = faceHTML(ion,"back");
+}
+
+function flip(){ if(!queue.length) return; flipped=!flipped; $("card").classList.toggle("flipped", flipped); }
+function again(){ if(!queue.length) return; queue.push(queue.shift()); flipped=false; render(); }
+function got(){ if(!queue.length) return; known.add(queue.shift()); flipped=false; render(); }
+
+$("card").addEventListener("click", flip);
+$("restart").addEventListener("click", () => reset(true));
+$("again").addEventListener("click", again);
+$("got").addEventListener("click", got);
+$("shuffle").addEventListener("click", () => { shuffle(queue); flipped=false; render(); });
+document.querySelectorAll("[data-charge]").forEach(b => b.addEventListener("click", () => {
+  charge = +b.dataset.charge;
+  document.querySelectorAll("[data-charge]").forEach(x => x.setAttribute("aria-pressed", x===b));
+  reset(false);
+}));
+document.querySelectorAll("[data-mode]").forEach(b => b.addEventListener("click", () => {
+  mode = b.dataset.mode;
+  document.querySelectorAll("[data-mode]").forEach(x => x.setAttribute("aria-pressed", x===b));
+  flipped=false; render();
+}));
+document.addEventListener("keydown", e => {
+  if(e.target.closest("summary")) return;
+  if(e.code==="Space"){ e.preventDefault(); flip(); }
+  else if(e.key==="1") again();
+  else if(e.key==="2") got();
+});
+
+// reference table
+let rows = "", last = 0;
+IONS.forEach(ion => {
+  if(ion.c!==last){ rows += `<tr><td class="grp" colspan="2" style="--accent:${ACCENT[ion.c]}">${chg(ion.c)} ions</td></tr>`; last=ion.c; }
+  rows += `<tr><td>${ion.n}</td><td>${formula(ion.f,ion.c)}${ion.alt?` or ${formula(ion.alt,ion.c)}`:""}</td></tr>`;
+});
+$("table").innerHTML = rows;
+
+reset(false);
+</script>
+</body>
+</html>
